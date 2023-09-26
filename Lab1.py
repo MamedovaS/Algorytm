@@ -1,6 +1,6 @@
 class Lab1:
     def find_indexer(self, numbers, target):
-        result = [-1, -1]
+        result = {}
         n = len(numbers)
 
         for i in range(n):
@@ -11,7 +11,7 @@ class Lab1:
                     result[1] = j
                     return result
 
-        return result
+        return -1
 
 
 if __name__ == "__main__":
