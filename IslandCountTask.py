@@ -14,18 +14,19 @@ def matrix_to_list(matrix):
     return adjacency_list
 
 
+def bfs(node, visited, adjacency_list):
+    queue = [node]
+    visited.add(node)
+
+    while queue:
+        current_node = queue.pop(0)
+        for neighbor in adjacency_list[current_node]:
+            if neighbor not in visited:
+                queue.append(neighbor)
+                visited.add(neighbor)
+
+
 def land_check(matrix):
-    def bfs(node):
-        queue = [node]
-        visited.add(node)
-
-        while queue:
-            current_node = queue.pop(0)
-            for neighbor in adjacency_list[current_node]:
-                if neighbor not in visited:
-                    queue.append(neighbor)
-                    visited.add(neighbor)
-
     if not matrix:
         return 0
 
@@ -35,7 +36,7 @@ def land_check(matrix):
 
     for node in adjacency_list.keys():
         if node not in visited:
-            bfs(node)
+            bfs(node, visited, adjacency_list)
             count += 1
 
     return count
@@ -44,7 +45,9 @@ def land_check(matrix):
 def read_matrix_from_stream(file_stream):
     matrix = []
     for line in file_stream:
-        matrix.append(list(map(int, line.strip().split())))
+        line = line.strip()
+        if line:
+            matrix.append(list(map(int, line.split())))
 
     return matrix
 
@@ -56,12 +59,10 @@ def write_result_to_stream(result, file_stream):
 input_file_path = './result/input_matrix.txt'
 output_file_path = './result/output_result.txt'
 
-
 with open(input_file_path, 'r') as input_file:
     graph = read_matrix_from_stream(input_file)
 
 result = land_check(graph)
-
 
 with open(output_file_path, 'w') as output_file:
     write_result_to_stream(result, output_file)
