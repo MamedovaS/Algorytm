@@ -1,0 +1,76 @@
+Index: linguistic.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/linguistic.py b/linguistic.py
+new file mode 100644
+--- /dev/null	(date 1702132112188)
++++ b/linguistic.py	(date 1702132112188)
+@@ -0,0 +1,44 @@
++def longest_word_chain(words):
++    word_set = set(words)
++    max_chain_length = 1
++
++    for word in words:
++        for i in range(len(word)):
++            modified_word = word[:i] + word[i + 1:]
++            if modified_word in word_set:
++                chain_length = 2
++                current_word = modified_word
++
++                while True:
++                    modified_word = current_word
++                    for j in range(len(current_word)):
++                        modified_word = current_word[:j] + current_word[j + 1:]
++                        if modified_word in word_set:
++                            chain_length += 1
++                            current_word = modified_word
++                            break
++                    else:
++                        break  # No valid modification found
++
++                max_chain_length = max(max_chain_length, chain_length)
++
++    return max_chain_length
++
++
++input_file_path = './result/wchain_in.txt'
++output_file_path = './result/wchain_result.txt'
++
++with open(input_file_path, "r") as file:
++    n_str = file.readline().strip()
++
++    if not n_str:
++        print("Error: Invalid input format.")
++        exit()
++
++    n = int(n_str)
++    words = [file.readline().strip() for _ in range(n)]
++
++result = longest_word_chain(words)
++
++with open(output_file_path, "w") as file:
++    file.write(str(result) + "\n")
+Index: result/wchain_in.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/result/wchain_in.txt b/result/wchain_in.txt
+new file mode 100644
+--- /dev/null	(date 1702153418539)
++++ b/result/wchain_in.txt	(date 1702153418539)
+@@ -0,0 +1,11 @@
++10
++crates
++car
++cats
++crate
++rate
++at
++ate
++tea
++rat
++a
+\ No newline at end of file
