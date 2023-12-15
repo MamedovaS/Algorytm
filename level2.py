@@ -1,79 +1,78 @@
-def create_sets_for_tribes(tribes_data):
-    sets_for_tribes = {}
+from itertools import combinations
+from collections import defaultdict
 
-    for tribe in tribes_data:
-        current_set = set(tribe)
-        sets_for_tribes[tuple(tribe)] = current_set
+from itertools import combinations
 
-    return sets_for_tribes
+def find_combinations(tribes):
+    all_combinations = set()
 
+    for i in range(len(tribes)):
+        for j in range(i + 1, len(tribes)):
+            tribe1 = tribes[i]
+            tribe2 = tribes[j]
 
-def sex(main_set):
-    even_subset = {item for item in main_set if item % 2 == 0}
-    odd_subset = {item for item in main_set if item % 2 != 0}
+            # Finding all possible combinations of two numbers from different tribes
+            tribe_combinations = combinations(tribe1, 1)  # Picking the first member from tribe1
 
-    return even_subset, odd_subset
+            for member1 in tribe_combinations:
+                for member2 in tribe2:
+                    all_combinations.add((member1[0], member2))
+                    all_combinations.add((member2, member1[0]))
 
+    return all_combinations
 
-def count_possible_pairs(N, pairs):
-    # Створюємо словник для збереження племен і їх членів
-    tribes_sets = create_sets_for_tribes(pairs)
+def generate_odd_even_pairs(combinations_set):
+    odd_even_pairs = set()
 
-    # Список для зберігання пар
-    pairs_list = []
+    for combination in combinations_set:
+        for pair in combinations(combination, 2):
+            if pair[0] % 2 != pair[1] % 2:
+                odd_even_pairs.add(pair)
 
-    while True:
-        # Ініціалізуємо лічильник можливих пар
-        count = 0
+    return odd_even_pairs
 
-        # Тимчасовий список для зберігання нових пар
-        temp_pairs_list = []
+def form_tribes(data):
+    connections = defaultdict(list)
 
-        # Обчислюємо кількість та пари
-        for i in range(1, N, 2):  # Перевіряємо пари хлопців/дівчат
-            for j in range(0, N, 2):
-                if i != j:
-                    pair_key1 = tuple(pairs[i])
-                    pair_key2 = tuple(pairs[j])
+    lines = data.split("\n")
 
-                    if pair_key1 in tribes_sets and pair_key2 in tribes_sets:
-                        set1 = tribes_sets[pair_key1]
-                        set2 = tribes_sets[pair_key2]
+    for line in lines:
+        if line:
+            person1, person2 = map(int, line.split())
+            connections[person1].append(person2)
+            connections[person2].append(person1)
 
-                        if list(sex(set1))[0] and list(sex(set2))[1]:
-                            count += 1
-                            temp_pairs_list.append((pairs[i][0], pairs[j][0]))
+    visited = set()
+    tribes = []
 
-        # Якщо жодна пара не відповідає умовам, виходимо з циклу
-        if count == 0:
-            break
+    for start_person in connections:
+        if start_person not in visited:
+            tribe = set()
+            stack = [start_person]
 
-        # Додаємо нові пари до загального списку
-        pairs_list.extend(temp_pairs_list)
+            while stack:
+                current = stack.pop()
+                if current not in visited:
+                    visited.add(current)
+                    tribe.add(current)
+                    stack.extend(connections[current])
 
-        # Оновлюємо дані племен
-        keys_to_delete = []
-        for pair in temp_pairs_list:
-            for key, value in tribes_sets.items():
-                if pair[0] in value or pair[1] in value:
-                    keys_to_delete.append(key)
+            tribes.append(tribe)
 
-        for key in keys_to_delete:
-            if key in tribes_sets:
-                del tribes_sets[key]
+    return tribes
 
-    # Виводимо кількість та пари
-    print(len(pairs_list))
-    for pair in pairs_list:
-        print(f"{pair[0]}/{pair[1]}")
+if __name__ == "__main__":
+    data_input = """1 2
+                    2 4
+                    3 5"""
 
-    return count
+    result = form_tribes(data_input)
 
+    combinations_result = find_combinations(result)
+    for combination in combinations_result:
+        print(combination)
 
-# Зчитуємо вхідні дані
-N = int(input("Enter the number of pairs: "))
-pairs = [list(map(int, input("Enter a pair of numbers separated by space: ").split(" "))) for _ in range(N)]
-
-# Обчислення та вивід результату
-result = count_possible_pairs(N, pairs)
-print(result)
+    valid_pairs_result = generate_odd_even_pairs(combinations_result)
+    print("\nValid Pairs (One even, one odd):")
+    for valid_pair in valid_pairs_result:
+        print(valid_pair)
